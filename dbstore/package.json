@@ -1,0 +1,9 @@
+{
+  "name": "dbstore",
+  "dependencies": {
+    "mongoose": "latest",
+	"async"   : "latest",
+	"request" : "latest",
+	"cheerio" : "latest"
+  }
+}
