@@ -1,0 +1,100 @@
+<html>
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script>
+console.log('Starting call');
+var myrebates = null;
+var hihi = null;
+$.getJSON("http://localhost:3500/test/rebates",
+   function(data) {
+	 myrebates = data;
+	 $('#refreshmydata').removeAttr("disabled");;
+     console.log(data);         
+   });
+var datelist = [];
+var rebatelist = [];
+var datalist = [];
+var wallist = [];
+var targetlist = [];
+console.log('Done with the call');
+
+function fnRefreshData(){
+//alert(myrebates);
+for(var i=30;i<myrebates.length;i++){
+	var rbt = myrebates[i];
+	console.log(rbt.brandname + '\n');
+	addListDate(rbt);
+	if("Target" == rbt.brandname){
+		targetlist.push([rbt.listingdate,parseFloat(rbt.rebate)]);
+	}
+	if("Walmart" == rbt.brandname){
+		wallist.push([rbt.listingdate,parseFloat(rbt.rebate)]);
+	}
+	datalist.push([rbt.listingdate,parseFloat(rbt.rebate)]);
+}
+
+   $(function () { 
+    $('#container').highcharts({
+        chart: {
+            type: 'line'
+        },
+        title: {
+            text: 'Rebate'
+        },
+        xAxis: {
+            categories: datelist
+        },
+        yAxis: {
+            title: {
+                text: 'Fruit eaten'
+            }
+        },
+        series: [{
+            name: 'Walmart',
+            data: wallist
+        },{
+            name: 'Target',
+            data: targetlist
+        }]
+    });
+});
+
+//console.log(myrebates);
+}
+
+function addListDate(rebt){
+var datePosi = containsDate(rebt.listingdate);
+if(datePosi> -1){
+		if(!$.isArray(rebatelist[datePosi])) {
+			rebatelist[datePosi] = [];
+		}
+		rebatelist[datePosi].push(rebt.rebate);
+		return;
+} else {
+	datelist.push(rebt.listingdate);
+	rebatelist[datelist.length - 1] = [];
+	console.log("DateList:" + datelist.length + "RebateList:" + rebatelist.length);
+	rebatelist[rebatelist.length - 1].push(rebt.rebate);
+}
+
+}
+function containsDate(mydt){
+	var cntDt = -1;
+	for(var i=0;i<datelist.length;i++){
+		var rbt = datelist[i];
+		if(rbt == mydt){
+			cntDt = i;
+			return i;
+		}
+	}	
+	return cntDt;
+}
+</script>
+</head>
+<body>
+Starting with charts..
+<div id="container" style="width:100%; height:400px;"></div>
+<input id="refreshmydata" type=button value="Refesh Data" onclick="fnRefreshData()" disabled="true"/>
+</body>
+</html>
